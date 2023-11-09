@@ -48,8 +48,10 @@ export function Header({ onLoginClick, loggedIn, setLoggedIn }) {
   const navigate = useNavigate();
 
   const handleAuth = () => {
+    // Log Out Functionality
     if (loggedIn) {
       setLoggedIn(false);
+      localStorage.removeItem("loggedIn");
       navigate("/");
     } else {
       onLoginClick();
@@ -67,7 +69,7 @@ export function Header({ onLoginClick, loggedIn, setLoggedIn }) {
         </HeaderContent>
         <ButtonWrapper>
           <StyledButton type="button" onClick={handleAuth} id="log-in-btn">
-            {loggedIn ? "Sign Out" : "Login"}
+            {loggedIn ? "Logout" : "Login"}
           </StyledButton>
         </ButtonWrapper>
       </HeaderWrapper>

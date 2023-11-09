@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom/client";
 import styled, { createGlobalStyle } from "styled-components";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
@@ -84,8 +84,14 @@ const MainWrapper = styled.main`
 `;
 
 export const App = () => {
-  const [loggedIn, setLoggedIn] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(localStorage.getItem("loggedIn") === "true");
   const [showLoginForm, setShowLoginForm] = useState(false);
+
+  // To fix a bug where if user refreshes when he is on a page that is only accessible when logged in, he will be redirected to the home page
+  // As such now, the login state is saved to local storage and user will only be logged out if he clicks the logout button and not when he refreshes
+  useEffect(() => {
+    localStorage.setItem("loggedIn", loggedIn);
+  }, [loggedIn]);
 
   const toggleLoginForm = () => {
     setShowLoginForm(!showLoginForm);
@@ -104,6 +110,7 @@ export const App = () => {
           <Login
             showLoginForm={showLoginForm}
             setShowLoginForm={setShowLoginForm}
+            loggedIn={loggedIn}
             setLoggedIn={setLoggedIn}
           />
           <Container>

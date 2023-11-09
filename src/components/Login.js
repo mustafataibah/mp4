@@ -51,42 +51,27 @@ const Notification = styled.div`
   visibility: ${({ show }) => (show ? "visible" : "hidden")};
 `;
 
-export function Login({ setLoggedIn, showLoginForm, setShowLoginForm }) {
+export function Login({ showLoginForm, setShowLoginForm, loggedIn, setLoggedIn }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [tryLimit, setTryLimit] = useState(0);
-  const [authFailed, setAuthFailed] = useState(false);
-  const [lastTryWarning, setLastTryWarning] = useState(false);
+
+  const handleLogin = () => {
+    setLoggedIn(true);
+    setShowLoginForm(false);
+    setTryLimit(0);
+    setUsername("");
+    setPassword("");
+  };
 
   const authenticate = () => {
-    let isAuthenticated = false;
+    setTryLimit(tryLimit + 1);
 
     for (const user in userPass) {
-      if (user === password && userPass[user] === username) {
-        isAuthenticated = true;
+      if (tryLimit < 3 && user === password && userPass[user] === username) {
+        handleLogin();
         break;
       }
-    }
-
-    if (isAuthenticated) {
-      setLoggedIn(true);
-      setShowLoginForm(false);
-      setTryLimit(0);
-      setUsername("");
-      setPassword("");
-      setAuthFailed(false);
-    } else {
-      setTryLimit((prevTryLimit) => {
-        const newTryLimit = prevTryLimit + 1;
-        if (newTryLimit >= 3) {
-          window.close();
-        }
-        if (newTryLimit === 2) {
-          setLastTryWarning(true);
-        }
-        return newTryLimit;
-      });
-      setAuthFailed(true);
     }
   };
 
@@ -113,14 +98,8 @@ export function Login({ setLoggedIn, showLoginForm, setShowLoginForm }) {
       <SubmitButton type="button" onClick={authenticate} disabled={exceededAttempts}>
         Submit
       </SubmitButton>
-      <Notification show={authFailed && showLoginForm}>
-        {authFailed && (
-          <h5>
-            {lastTryWarning
-              ? `Last attempt remaining, the page will close after this try.`
-              : `Authentication failed, you have ${3 - tryLimit} more tries`}
-          </h5>
-        )}
+      <Notification show={tryLimit > 0 && showLoginForm}>
+        <h5>Authentication failed, you have {3 - tryLimit} more tries</h5>
       </Notification>
     </LoginScreen>
   );
